@@ -3,4 +3,5 @@ export type ButtonProps = {
     onClick?: () => void
     link?: string
     className?: string
+    disabled?: boolean
 }

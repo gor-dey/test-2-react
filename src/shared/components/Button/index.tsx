@@ -1,7 +1,9 @@
 import { ButtonProps } from '@shared/types'
 import { Link } from 'react-router-dom'
 
-export const Button = (props: ButtonProps) => {
+type BasicButtonProps = React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
+
+export const Button = (props: ButtonProps & BasicButtonProps) => {
     if (props.link)
         return (
             <Link to={props.link}>
@@ -12,7 +14,7 @@ export const Button = (props: ButtonProps) => {
         )
     else {
         return (
-            <button className={`btn btn-primary mt-auto ${props.className}`} onClick={props.onClick}>
+            <button {...props} className={`btn btn-primary mt-auto ${props.className}`} onClick={props.onClick}>
                 {props.text}
             </button>
         )

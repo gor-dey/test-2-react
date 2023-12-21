@@ -1,46 +1,64 @@
 import { emailValidation } from '@shared/utils'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { useState } from 'react'
 
-type Props = {
-    setIsValid: Dispatch<SetStateAction<boolean>>
-    setData: Dispatch<SetStateAction<string>>
-}
-
-export const FormInput = (props: Props) => {
+export const FormInput = () => {
+    const [isEmailValid, setIsEmailValid] = useState<boolean>(true)
+    const [isFormSuccess, setIsFormSuccess] = useState<boolean>(false)
     const [value, setValue] = useState<string>('')
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
         e.preventDefault()
-        try {
-            const isEmail: boolean = emailValidation(value)
-            if (isEmail) {
-                props.setData(value)
-            } else {
-                props.setIsValid(false)
-                setTimeout(() => {
-                    props.setIsValid(true)
-                }, 1000)
+        handleFormValidation(value)
+    }
 
-                console.warn('Invalid email')
+    const handleFormValidation = (email: string): void => {
+        try {
+            const isValidEmail: boolean = emailValidation(email)
+
+            if (isValidEmail) {
+                handleFormSuccess(email)
+            } else {
+                handleInvalidEmail()
             }
         } catch (error) {
-            console.log(error)
+            console.error('Error during form validation:', error)
         }
+
         setValue('')
     }
 
+    const handleFormSuccess = (email: string): void => {
+        sessionStorage.setItem('validEmail', email)
+        setIsFormSuccess(true)
+        setTimeout(() => {
+            setIsFormSuccess(false)
+        }, 1200)
+    }
+
+    const handleInvalidEmail = (): void => {
+        sessionStorage.removeItem('validEmail')
+        setIsEmailValid(false)
+        setTimeout(() => {
+            setIsEmailValid(true)
+        }, 1200)
+
+        console.warn('Invalid email')
+    }
+
     return (
-        <form onSubmit={(e): void => handleSubmit(e)} className="form-control">
+        <form onSubmit={handleSubmit} className="form-control">
             <div className="label">
                 <span className="label-text">Email</span>
             </div>
             <input
-                onChange={(e): void => setValue(e.target.value)}
+                onChange={(e) => setValue(e.target.value)}
                 value={value}
                 type="text"
                 placeholder="Type here"
                 className="input"
             />
+            {!isEmailValid && <span className="label label-text-alt text-red-500">Invalid email</span>}
+            {isFormSuccess && <span className="label label-text-alt text-green-500">Email success</span>}
         </form>
     )
 }
