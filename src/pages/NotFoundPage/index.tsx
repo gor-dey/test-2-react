@@ -5,7 +5,7 @@ export const NotFoundPage = () => {
         <>
             <h1>Страница не найдена!</h1>
             <br />
-            <Button link="/" text="На главную" />
+            <Button text="На главную" />
         </>
     )
 }
