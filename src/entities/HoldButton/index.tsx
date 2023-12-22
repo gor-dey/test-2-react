@@ -1,5 +1,5 @@
 import { Button } from '@shared/components'
-import { ButtonProps } from '@shared/types'
+import { ButtonProps, HoldType } from '@shared/types'
 import { useCallback, useEffect, useState } from 'react'
 
 type Props = {
@@ -10,12 +10,15 @@ const timerConfig = {
     max: 500,
     step: 100,
 }
+const holdOptions: { [key: string]: HoldType } = {
+    up: 'up',
+    down: 'down',
+}
 
 export const HoldButton = ({ handleClick, ...props }: Props & ButtonProps) => {
     const [timer, setTimer] = useState<number>(timerConfig.max)
-    const [isButtonHeld, setIsButtonHeld] = useState<boolean>(false)
-    const [isMouseUp, setIsMouseUp] = useState<boolean>(false)
-    const [actionTriggered, setActionTriggered] = useState<boolean>(false)
+    const [isActionTriggered, setIsActionTriggered] = useState<boolean>(false)
+    const [holdType, setHoldType] = useState<HoldType>(holdOptions.up)
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout
@@ -27,22 +30,22 @@ export const HoldButton = ({ handleClick, ...props }: Props & ButtonProps) => {
             setTimer((prevTimer): number => Math.max(0, prevTimer + timerConfig.step))
         }
 
-        if (isButtonHeld && !actionTriggered) {
+        if (holdType === holdOptions.down && !isActionTriggered) {
             intervalId = setInterval(() => {
                 decreaseTimer()
 
                 if (timer <= 0) {
-                    setActionTriggered(true)
+                    setIsActionTriggered(true)
                     handleClick()
                 }
             }, timerConfig.step)
         }
-        if (isMouseUp && !actionTriggered) {
+        if (holdType === holdOptions.up && !isActionTriggered) {
             intervalId = setInterval(() => {
                 increaseTimer()
 
                 if (timer >= timerConfig.max) {
-                    setActionTriggered(true)
+                    setIsActionTriggered(true)
                     setTimer(timerConfig.max)
                 }
             }, timerConfig.step)
@@ -51,22 +54,18 @@ export const HoldButton = ({ handleClick, ...props }: Props & ButtonProps) => {
         return () => {
             clearInterval(intervalId)
         }
-    }, [isButtonHeld, timer, actionTriggered, isMouseUp])
+    }, [timer, isActionTriggered, holdType])
 
     const handleMouseDown = useCallback(() => {
         setTimer(timerConfig.max)
-        setIsMouseUp(false)
-        setActionTriggered(false)
-        setIsButtonHeld(true)
+        setIsActionTriggered(false)
+        setHoldType(holdOptions.down)
     }, [])
 
     const handleMouseUp = useCallback(() => {
-        if (isButtonHeld) {
-            setIsButtonHeld(false)
-            setActionTriggered(false)
-            setIsMouseUp(true)
-        }
-    }, [isButtonHeld])
+        setIsActionTriggered(false)
+        setHoldType(holdOptions.up)
+    }, [])
 
     let buttonText
 

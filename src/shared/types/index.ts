@@ -5,3 +5,5 @@ export type ButtonProps = {
     disabled?: boolean
 }
 export type Return = 'Success!' | 'Error!'
+
+export type HoldType = 'up' | 'down'
