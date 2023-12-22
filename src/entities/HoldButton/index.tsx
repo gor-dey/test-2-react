@@ -17,10 +17,6 @@ export const HoldButton = ({ handleClick, ...props }: Props & ButtonProps) => {
     const [isMouseUp, setIsMouseUp] = useState<boolean>(false)
     const [actionTriggered, setActionTriggered] = useState<boolean>(false)
 
-    const memoHandleClick = useCallback(() => {
-        handleClick()
-    }, [handleClick])
-
     useEffect(() => {
         let intervalId: NodeJS.Timeout
 
@@ -37,7 +33,7 @@ export const HoldButton = ({ handleClick, ...props }: Props & ButtonProps) => {
 
                 if (timer <= 0) {
                     setActionTriggered(true)
-                    memoHandleClick()
+                    handleClick()
                 }
             }, timerConfig.step)
         }
