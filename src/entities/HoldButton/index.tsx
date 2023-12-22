@@ -2,40 +2,78 @@ import { Button } from '@shared/components'
 import { ButtonProps } from '@shared/types'
 import { useEffect, useState } from 'react'
 
-export const HoldButton = (props: ButtonProps) => {
-    const [timer, setTimer] = useState<number>(500)
+type Props = {
+    handleClick: () => void
+}
+
+const timerConfig = {
+    max: 500,
+    step: 100,
+}
+
+export const HoldButton = ({ handleClick, ...props }: Props & ButtonProps) => {
+    const [timer, setTimer] = useState<number>(timerConfig.max)
     const [isButtonHeld, setIsButtonHeld] = useState<boolean>(false)
+    const [isMouseUp, setIsMouseUp] = useState<boolean>(false)
+    const [actionTriggered, setActionTriggered] = useState<boolean>(false)
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout
 
-        if (isButtonHeld) {
+        const decreaseTimer = () => {
+            setTimer((prevTimer): number => Math.max(0, prevTimer - timerConfig.step))
+        }
+        const increaseTimer = () => {
+            setTimer((prevTimer): number => Math.max(0, prevTimer + timerConfig.step))
+        }
+
+        if (isButtonHeld && !actionTriggered) {
             intervalId = setInterval(() => {
-                setTimer((prevTimer) => Math.max(0, prevTimer - 10))
-            }, 10)
+                decreaseTimer()
+
+                if (timer <= 0) {
+                    setActionTriggered(true)
+                    handleClick()
+                }
+            }, timerConfig.step)
+        }
+        if (isMouseUp && !actionTriggered) {
+            intervalId = setInterval(() => {
+                increaseTimer()
+
+                if (timer >= timerConfig.max) {
+                    setActionTriggered(true)
+                    setTimer(timerConfig.max)
+                }
+            }, timerConfig.step)
         }
 
         return () => {
             clearInterval(intervalId)
         }
-    }, [isButtonHeld])
+    }, [isButtonHeld, timer, actionTriggered, handleClick, isMouseUp])
 
     const handleMouseDown = () => {
+        setTimer(timerConfig.max)
+        setIsMouseUp(false)
+
+        setActionTriggered(false)
         setIsButtonHeld(true)
     }
 
     const handleMouseUp = () => {
         if (isButtonHeld) {
             setIsButtonHeld(false)
-            setTimer(500)
+            setActionTriggered(false)
+            setIsMouseUp(true)
         }
     }
 
     let buttonText
 
     if (timer <= 0) {
-        buttonText = 'Button held for 500 milliseconds!'
-    } else if (timer === 500) {
+        buttonText = `Button held for ${timerConfig.max} milliseconds!`
+    } else if (timer >= timerConfig.max) {
         buttonText = 'Hold to proceed'
     } else {
         buttonText = `${timer / 1000}s`

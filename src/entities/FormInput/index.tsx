@@ -1,9 +1,11 @@
 import { emailValidation } from '@shared/utils'
-import { useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 
-export const FormInput = () => {
-    const [isEmailValid, setIsEmailValid] = useState<boolean>(true)
-    const [isFormSuccess, setIsFormSuccess] = useState<boolean>(false)
+type Props = {
+    setIsEmailValid: Dispatch<SetStateAction<boolean>>
+}
+
+export const FormInput = (props: Props) => {
     const [value, setValue] = useState<string>('')
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
@@ -16,9 +18,13 @@ export const FormInput = () => {
             const isValidEmail: boolean = emailValidation(email)
 
             if (isValidEmail) {
-                handleFormSuccess(email)
+                sessionStorage.setItem('validEmail', email)
+                props.setIsEmailValid(true)
             } else {
-                handleInvalidEmail()
+                sessionStorage.removeItem('validEmail')
+                props.setIsEmailValid(false)
+
+                console.warn('Invalid email')
             }
         } catch (error) {
             console.error('Error during form validation:', error)
@@ -27,23 +33,7 @@ export const FormInput = () => {
         setValue('')
     }
 
-    const handleFormSuccess = (email: string): void => {
-        sessionStorage.setItem('validEmail', email)
-        setIsFormSuccess(true)
-        setTimeout(() => {
-            setIsFormSuccess(false)
-        }, 1200)
-    }
-
-    const handleInvalidEmail = (): void => {
-        sessionStorage.removeItem('validEmail')
-        setIsEmailValid(false)
-        setTimeout(() => {
-            setIsEmailValid(true)
-        }, 1200)
-
-        console.warn('Invalid email')
-    }
+    const placeholder: string = sessionStorage.getItem('validEmail') || 'Type here'
 
     return (
         <form onSubmit={handleSubmit} className="form-control">
@@ -54,11 +44,9 @@ export const FormInput = () => {
                 onChange={(e) => setValue(e.target.value)}
                 value={value}
                 type="text"
-                placeholder="Type here"
+                placeholder={placeholder}
                 className="input"
             />
-            {!isEmailValid && <span className="label label-text-alt text-red-500">Invalid email</span>}
-            {isFormSuccess && <span className="label label-text-alt text-green-500">Email success</span>}
         </form>
     )
 }

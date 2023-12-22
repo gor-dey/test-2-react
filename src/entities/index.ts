@@ -1,3 +1,6 @@
 export * from './FormInput'
 export * from './FormCheckbox'
 export * from './HoldButton'
+export * from './FormStep2'
+export * from './ButtonConfirm'
+export * from './PopUp'
