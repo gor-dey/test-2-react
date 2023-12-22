@@ -39,6 +39,7 @@ export const FormInput = (props: Props) => {
         <form onSubmit={handleSubmit} className="form-control">
             <div className="label">
                 <span className="label-text">Email</span>
+                {value.length > 0 && <span className="label-text text-blue-400">Press Enter to save the changes!</span>}
             </div>
             <input
                 onChange={(e) => setValue(e.target.value)}
