@@ -8,7 +8,7 @@ export const Login = () => {
     const history = useHistory()
 
     const handleClick = (): void => {
-        history.push('/step-2')
+        history.push('/login/step-2')
     }
 
     return (

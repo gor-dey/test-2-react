@@ -9,9 +9,9 @@ export const App = () => {
         <RouterLayout>
             <Layout>
                 <Switch>
-                    <Redirect exact from="/" to="/login" />
-                    <Route path="/login" component={LoginPage} />
-                    <Route path="/step-2" component={Step2Page} />
+                    <Redirect exact from="/" to="/login/step-1" />
+                    <Route path="/login/step-1" component={LoginPage} />
+                    <Route path="/login/step-2" component={Step2Page} />
 
                     <Route path="*" component={NotFoundPage} />
                 </Switch>
